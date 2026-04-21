@@ -13,30 +13,25 @@ export default function Home() {
     setLoading(true)
 
     try {
-      // --- LOGIKA AUTO DELETE (BERSIH-BERSIH OTOMATIS) ---
-      // Mengambil daftar file, diurutkan dari yang paling lama
+      // --- LOGIKA AUTO DELETE (PURGE) ---
       const { data: listFiles } = await supabase.storage
         .from('files')
         .list('', { sortBy: { column: 'created_at', order: 'asc' } })
 
       if (listFiles) {
-        // Hitung total ukuran file yang ada dalam bytes
         const currentSize = listFiles.reduce((acc, f) => acc + (f.metadata?.size || 0), 0)
         
-        // Batas 50MB (50 * 1024 * 1024 bytes)
         const limitSize = 50 * 1024 * 1024 
 
         if (currentSize > limitSize) {
-          // Ambil 5 file teratas (paling lama) untuk dihapus
           const filesToDelete = listFiles.slice(0, 5).map(f => f.name)
           await supabase.storage.from('files').remove(filesToDelete)
           console.log("Penyimpanan penuh, sistem otomatis menghapus file lama.")
         }
       }
 
-      // --- PROSES UPLOAD FILE BARU ---
+      // --- PROSES UPLOAD ---
       const fileExt = file.name.split('.').pop()
-      // Membuat nama file acak agar tidak bentrok
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`
 
       const { data, error: uploadError } = await supabase.storage
@@ -45,7 +40,6 @@ export default function Home() {
 
       if (uploadError) throw uploadError
 
-      // Ambil link publik untuk ditampilkan
       const { data: linkData } = supabase.storage.from('files').getPublicUrl(fileName)
       setFileUrl(linkData.publicUrl)
 
@@ -73,9 +67,9 @@ export default function Home() {
           />
           <div className="text-4xl mb-4">☁️</div>
           <p className="text-sm font-medium text-zinc-300">
-            {loading ? "Sedang Mengirim..." : "Klik atau Tarik File Ke Sini"}
+            {loading ? "Sedang Mengirim..." : "Upload File"}
           </p>
-          <p className="text-[10px] text-zinc-500 mt-2">Auto-Purge Aktif: Max 50MB</p>
+          <p className="text-[10px] text-zinc-500 mt-2">Max 50MB</p>
         </div>
 
         {fileUrl && (
@@ -99,7 +93,15 @@ export default function Home() {
           </div>
         )}
       </div>
-      <p className="mt-8 text-zinc-600 text-[10px]">Powered by Next.js & Supabase</p>
+
+      <footer className="mt-8 flex flex-col items-center gap-1">
+        <p className="text-zinc-400 text-xs font-medium">
+          Created by <span className="text-blue-400 font-bold">Muhammad Wahid</span>
+        </p>
+        <p className="text-zinc-600 text-[10px] tracking-widest uppercase">
+          Powered by Next.js & Supabase
+        </p>
+      </footer>
     </main>
   )
 }
