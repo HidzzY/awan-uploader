@@ -54,7 +54,7 @@ export default function Home() {
     <main className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-6 font-sans">
       <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-3xl shadow-2xl">
         <h1 className="text-3xl font-bold mb-2 text-center bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
-          Up Awan
+          AwanDrive
         </h1>
         <p className="text-zinc-500 text-center text-sm mb-8">Upload gambar, video, atau mp3 gratis</p>
         
